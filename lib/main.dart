@@ -634,8 +634,7 @@ class _RobotControlState extends State<RobotControl> {
               right: 0,
               child: Center(
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.black,
                     borderRadius: BorderRadius.circular(0),
@@ -643,39 +642,54 @@ class _RobotControlState extends State<RobotControl> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Motion Control
-                      InkWell(
-                        onTap: () => debugPrint('Motion Control pressed'),
-                        child: Image.asset(
-                          'assets/icons/Motion Control.png',
-                          height: 48,
-                        ),
+                    // Motion Control
+                    InkWell(
+                      onTap: () => debugPrint('Motion Control pressed'),
+                      child: Image.asset(
+                        'assets/icons/Motion Control.png',
+                        height: 48,
                       ),
-                      const SizedBox(width: 24),
+                    ),
+                    const SizedBox(width: 24),
 
-                      // Voice Control
-                      InkWell(
-                        onTap: () => debugPrint('Voice Control pressed'),
-                        child: Image.asset(
-                          'assets/icons/Voice Control.png',
-                          height: 48,
-                        ),
+                    // Voice Control
+                    InkWell(
+                      onTap: () => debugPrint('Voice Control pressed'),
+                      child: Image.asset(
+                        'assets/icons/Voice Control.png',
+                        height: 48,
                       ),
-                      const SizedBox(width: 24),
+                    ),
+                    const SizedBox(width: 24),
 
-                      // Status Hover
-                      InkWell(
-                        onTap: () => debugPrint('Status Hover pressed'),
-                        child: Image.asset(
-                          'assets/icons/status=Default.png',
-                          height: 48,
-                        ),
+                    // Status Hover
+                    InkWell(
+                      onTap: () => debugPrint('Status Hover pressed'),
+                      child: Image.asset(
+                        'assets/icons/status=Default.png',
+                        height: 48,
                       ),
-                    ],
+                    ),
+                    const SizedBox(width: 24),
+
+                    // Chat button
+                    InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const ChatPage()),
+                      );
+                    },
+                    child: Image.asset(
+                      'assets/icons/chat.png', // make sure you have this icon in assets/icons
+                      height: 48,
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
+          ),
+        ),
 
             //  Zoom controls
             Positioned(
@@ -776,6 +790,137 @@ class Dashboard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class ChatPage extends StatefulWidget {
+  const ChatPage({super.key});
+
+  @override
+  State<ChatPage> createState() => _ChatPageState();
+}
+
+class _ChatPageState extends State<ChatPage> {
+  final TextEditingController _controller = TextEditingController();
+  final List<Map<String, String>> _messages = [
+    {"sender": "robot", "text": "Hello, operator 👋"},
+    {"sender": "user", "text": "Hi Robot! Ready to work?"},
+  ];
+
+  void _sendMessage() {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+    setState(() {
+      _messages.add({"sender": "user", "text": text});
+      _controller.clear();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Top title bar
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(Icons.chat_bubble_outline, color: Colors.white70),
+                  SizedBox(width: 8),
+                  Text(
+                    "Chat",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const Divider(color: Colors.grey),
+
+            // Chat messages
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.all(12),
+                itemCount: _messages.length,
+                itemBuilder: (context, index) {
+                  final msg = _messages[index];
+                  final isUser = msg["sender"] == "user";
+                  return Align(
+                    alignment:
+                        isUser ? Alignment.centerRight : Alignment.centerLeft,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 6),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: isUser
+                            ? const Color(0xFF2D9CDB)
+                            : const Color(0xFF2D2D2D),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        msg["text"]!,
+                        style: const TextStyle(color: Colors.white, fontSize: 14),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            // Message input bar
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: const BoxDecoration(
+                color: Color(0xFF1A1A1A),
+                border: Border(
+                  top: BorderSide(color: Colors.grey, width: 0.5),
+                ),
+              ),
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: () => debugPrint("Camera tapped"),
+                    icon: const Icon(Icons.camera_alt_outlined,
+                        color: Colors.white70),
+                  ),
+                  IconButton(
+                    onPressed: () => debugPrint("Photo tapped"),
+                    icon: const Icon(Icons.photo_outlined,
+                        color: Colors.white70),
+                  ),
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        hintText: "Send a message to robot engine",
+                        hintStyle: TextStyle(color: Colors.white54),
+                        border: InputBorder.none,
+                      ),
+                      onSubmitted: (_) => _sendMessage(),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: _sendMessage,
+                    icon:
+                        const Icon(Icons.send, color: Color(0xFF2D9CDB)),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
