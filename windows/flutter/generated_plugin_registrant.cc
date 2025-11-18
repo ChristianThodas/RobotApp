@@ -6,6 +6,12 @@
 
 #include "generated_plugin_registrant.h"
 
+#include <camera_windows/camera_windows.h>
+#include <gal/gal_plugin_c_api.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
+  CameraWindowsRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("CameraWindows"));
+  GalPluginCApiRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("GalPluginCApi"));
 }
